@@ -1,0 +1,25 @@
+{
+    "name": "kak/authclient",
+    "description": "Auth clients for Yii2",
+    "type": "library",
+    "keywords": ["yii2","Auth2","Auth2 clients"],
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/sanchezzzhak/kak-authclient/issues?state=open",
+        "source": "https://github.com/sanchezzzhak/kak-authclient"
+    },
+    "authors": [
+        {
+            "name": "Tutik Alexsandr",
+            "email": "sanchezzzhak@ya.ru"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "kak\\authclient": "src"
+        }
+    }
+}
