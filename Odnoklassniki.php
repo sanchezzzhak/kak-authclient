@@ -1,6 +1,7 @@
 <?php namespace kak\authclient;
 
 use yii\authclient\OAuth2;
+use yii\httpclient\Request;
 
 /**
  * Class Odnoklassniki
@@ -54,22 +55,24 @@ class Odnoklassniki extends OAuth2
         ]);
     }
 
+
     /**
-     * @inheritdoc
+     * @param Request $request
+     * @param $accessToken
      */
-    protected function apiInternal($accessToken, $url, $method, array $params, array $headers)
+    public function applyAccessTokenToRequest($request, $accessToken)
     {
-        $access_token = $accessToken->getToken();
-        if (count($params)) {
+        $data = $request->getData();
+
+        if (count($data)) {
             $param_str = '';
-            ksort($params);
-            foreach ($params as $k => $v) {
+            ksort($data);
+            foreach ($data as $k => $v) {
                 $param_str .= $k . '=' . $v;
             }
-            $params['sig'] = md5($param_str . md5($access_token . $this->clientSecret));
+            $params['sig'] = md5($param_str . md5($accessToken->getToken() . $this->clientSecret));
         }
-        $params['access_token'] = $access_token;
-        return $this->sendRequest($method, trim($url, '/'), $params, $headers);
+        $request->setData($data);
     }
 
     /**

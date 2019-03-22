@@ -54,39 +54,42 @@ class Mailru extends OAuth2
         return $this->api('users.getInfo', 'GET');
     }
 
-    public function api($apiSubUrl, $method = 'GET', array $params = [], array $headers = [])
+    /**
+     * @param string $apiSubUrl
+     * @param string $method
+     * @param array $data
+     * @param array $headers
+     * @return array
+     */
+    public function api($apiSubUrl, $method = 'GET', $data = [], $headers = [])
     {
-        $params['method'] = $apiSubUrl;
-        return parent::api($this->apiBaseUrl, $method, $params, $headers);
+        $data['method'] = $apiSubUrl;
+        return parent::api($this->apiBaseUrl, $method, $data, $headers);
     }
 
-    protected function determineContentTypeByRaw($rawContent)
-    {
-        if (preg_match('/^\\[.*\\]$/is', $rawContent)) {
-            return self::CONTENT_TYPE_JSON;
-        }
-
-        return parent::determineContentTypeByRaw($rawContent);
-    }
 
     /**
-     * @inheritdoc
+     * @param Request $request
+     * @param $accessToken
      */
-    protected function apiInternal($accessToken, $url, $method, array $params, array $headers)
+    public function applyAccessTokenToRequest($request, $accessToken)
     {
-        $params['format'] = 'json';
-        $params['secure'] = 1;
-        $params['app_id'] = $this->clientId;
-        $token = $accessToken->getToken();
-        $params['session_key'] = $token;
+        $data = $request->getData();
+
+        $data['format'] = 'json';
+        $data['secure'] = 1;
+        $data['app_id'] = $this->clientId;
+        $data['session_key'] =  $accessToken->getToken();
+
         //sign up params - http://api.mail.ru/docs/guides/restapi/#server
-        ksort($params);
+        ksort($data);
         $str = '';
-        foreach ($params as $key => $value) {
+        foreach ($data as $key => $value) {
             $str .= "$key=$value";
         }
-        $params['sig'] = md5($str . $this->clientSecret);
-        return $this->sendRequest($method, $url, $params, $headers);
+        $data['sig'] = md5($str . $this->clientSecret);
+
+        $request->setData($data);
     }
 
     /**
