@@ -16,7 +16,6 @@ class Instagram extends OAuth2
 
     public $tokenUrl = 'https://api.instagram.com/oauth/access_token';
 
-
     public $apiBaseUrl = 'https://api.instagram.com/v1';
 
     /**
