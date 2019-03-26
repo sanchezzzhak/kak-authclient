@@ -3,6 +3,7 @@
 use yii\authclient\OAuth2;
 use yii\httpclient\Request;
 
+
 /**
  * Class Instagram
  * @package kak\authclient
@@ -18,6 +19,10 @@ class Instagram extends OAuth2
 
     public $apiBaseUrl = 'https://api.instagram.com/v1';
 
+    public $validateAuthState = false;
+
+    public $scope = 'basic';
+
     /**
      * @return array
      */
@@ -27,8 +32,6 @@ class Instagram extends OAuth2
         return $response['data'];
     }
 
-
-
     /**
      * @param Request $request
      * @param $accessToken
@@ -36,9 +39,7 @@ class Instagram extends OAuth2
     public function applyAccessTokenToRequest($request, $accessToken)
     {
         $data = $request->getData();
-
-        $data['access_token'] =  $accessToken->getToken();
-
+        $data['access_token'] = $accessToken->getToken();
         $request->setData($data);
     }
 
@@ -57,4 +58,5 @@ class Instagram extends OAuth2
     {
         return 'Instagram';
     }
+
 }

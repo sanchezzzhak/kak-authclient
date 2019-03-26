@@ -50,7 +50,6 @@ class Odnoklassniki extends OAuth2
         return $this->api('', 'GET', [
             'method' => 'users.getCurrentUser',
             'format' => 'JSON',
-            'application_key' => $this->application_public_key,
             'client_id' => $this->clientId,
         ]);
     }
@@ -63,17 +62,22 @@ class Odnoklassniki extends OAuth2
     public function applyAccessTokenToRequest($request, $accessToken)
     {
         $data = $request->getData();
-
-        if (count($data)) {
-            $param_str = '';
-            ksort($data);
-            foreach ($data as $k => $v) {
-                $param_str .= $k . '=' . $v;
-            }
-            $params['sig'] = md5($param_str . md5($accessToken->getToken() . $this->clientSecret));
-        }
+        $data['application_key'] = $this->application_public_key;
+        $data['sig'] = $this->generateSignature($data);
+        $data['access_token'] = $accessToken->getToken();
         $request->setData($data);
     }
+
+    protected function generateSignature(array $params)
+    {
+        ksort($params);
+        $query = '';
+        foreach ($params as $key => $param) {
+            $query .= sprintf('%s=%s', $key, $param);
+        }
+        return md5($query . md5($this->accessToken->getToken() . $this->clientSecret));
+    }
+
 
     /**
      * @inheritdoc
